@@ -46,15 +46,21 @@
                                         {{ DateHelper::format($booking->end_date) }}
                                     </td>
                                     <td class="text-sm font-weight-normal mb-0 text-center">{{ $booking->no_of_guests }}</td>
-                                    <td class="justify-content-center d-flex">
-                                        <a href="{{ route('admin.booking.show', $booking->uuid) }}" class="btn btn-link text-secondary mb-0"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                                        <form action="{{ route('admin.booking.destroy', $booking->uuid) }}" method="POST">
+                                    <td class="justify-content-center d-flex gap-2">
+                                        <a href="{{ route('admin.booking.show', $booking->uuid) }}" 
+                                           class="btn btn-sm btn-outline-info" 
+                                           title="View">
+                                            <i class="fa fa-eye"></i> View
+                                        </a>
+                                        
+                                        <form action="{{ route('admin.booking.destroy', $booking->uuid) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit" class="text-danger px-1 btn delete" title="delete">
-                                                <span class="btn-inner--icon">
-                                                    <i class="fa fa-trash"></i>
-                                                </span>
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-outline-danger delete" 
+                                                    title="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this booking?')">
+                                                <i class="fa fa-trash"></i> Delete
                                             </button>
                                         </form>
                                     </td>
