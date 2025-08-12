@@ -85,7 +85,7 @@
                         <label class="" for="image">Unit Images</label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror @error('image.*') is-invalid @enderror" 
                                name="image[]" multiple accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" id="imageInput"/>
-                        <small class="form-text text-muted">You can select multiple images. Accepted formats: JPG, PNG, GIF, WEBP (Max: 2MB each)</small>
+                        <small class="form-text text-muted">You can select multiple images. Accepted formats: JPG, PNG, GIF, WEBP (Max: 10MB each)</small>
                     </div>
                     
                     @error('image')

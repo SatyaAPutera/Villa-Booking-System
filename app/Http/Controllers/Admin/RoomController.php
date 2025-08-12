@@ -65,7 +65,7 @@ class RoomController extends Controller
             'rate' => 'required|numeric|min:0',
             'occupancy' => 'required|integer|min:1',
             'image' => 'nullable|array',
-            'image.*' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+            'image.*' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:10240'
         ]);
 
         $room = new Room();
@@ -141,7 +141,11 @@ class RoomController extends Controller
             'description' => 'required|string',
             'rate' => 'required|numeric|min:0',
             'occupancy' => 'required|integer|min:1',
-            'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'existing_images' => 'array',
+            'existing_images.*' => 'string',
+            'delete_images' => 'array',
+            'delete_images.*' => 'string'
         ]);
 
         $room->name = $request->name;
@@ -149,16 +153,74 @@ class RoomController extends Controller
         $room->rate = $request->rate;
         $room->occupancy = $request->occupancy;
 
-        // Handle image upload for updates
-        if ($request->hasFile('image')) {
-            $images = [];
-            foreach ($request->file('image') as $image) {
-                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('assets/img/rooms'), $imageName);
-                $images[] = 'assets/img/rooms/' . $imageName;
-            }
-            $room->image = json_encode($images); // Store as JSON array
+        // Start with existing images (minus deleted ones)
+        $currentImages = $room->image ?? [];
+        if (is_string($currentImages)) {
+            $currentImages = json_decode($currentImages, true) ?? [];
         }
+
+        // Handle image deletion
+        $imagesToDelete = $request->input('delete_images', []);
+        if (!empty($imagesToDelete)) {
+            foreach ($imagesToDelete as $imageToDelete) {
+                // Remove from current images array
+                $currentImages = array_filter($currentImages, function($img) use ($imageToDelete) {
+                    return $img !== $imageToDelete;
+                });
+                
+                // Delete physical file
+                $fullPath = public_path($imageToDelete);
+                if (file_exists($fullPath)) {
+                    try {
+                        unlink($fullPath);
+                        \Log::info("Deleted image file: $imageToDelete");
+                    } catch (\Exception $e) {
+                        \Log::error("Failed to delete image file: $imageToDelete - " . $e->getMessage());
+                    }
+                }
+            }
+        }
+
+        // Keep only the remaining existing images
+        $existingImages = $request->input('existing_images', []);
+        $finalImages = array_intersect($currentImages, $existingImages);
+
+        // Handle new image uploads
+        if ($request->hasFile('image')) {
+            $newImages = [];
+            
+            // Create directory if it doesn't exist
+            $uploadPath = public_path('assets/img/rooms');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            foreach ($request->file('image') as $key => $image) {
+                if ($image && $image->isValid()) {
+                    $imageName = time() . '_' . $key . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    
+                    try {
+                        $moved = $image->move($uploadPath, $imageName);
+                        if ($moved) {
+                            $newImages[] = 'assets/img/rooms/' . $imageName;
+                            \Log::info("Image uploaded successfully: $imageName");
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error("Image upload failed: " . $e->getMessage());
+                        return back()->withErrors(['image' => 'Failed to upload image ' . ($key + 1) . ': ' . $e->getMessage()])->withInput();
+                    }
+                } else {
+                    \Log::error("Invalid image at index $key");
+                    return back()->withErrors(['image' => 'Invalid image file at position ' . ($key + 1)])->withInput();
+                }
+            }
+            
+            // Merge final images with new images
+            $finalImages = array_merge(array_values($finalImages), $newImages);
+        }
+
+        // Update room with final image array
+        $room->image = array_values($finalImages); // Re-index array
 
         $room->save();
 
