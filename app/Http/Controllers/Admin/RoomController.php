@@ -74,6 +74,7 @@ class RoomController extends Controller
         $room->description = $request->description;
         $room->rate = $request->rate;
         $room->occupancy = $request->occupancy;
+        $room->created_by = auth()->guard('admin')->user()->uuid;
 
         // Handle image upload
         if ($request->hasFile('image')) {
