@@ -19,11 +19,10 @@ class Room extends Model
         'name',
         'description',
         'rate',
-        'occupancy',  
-        'image'
-    ];
-
-    protected $casts = [
+        'occupancy',
+        'image',
+        'created_by'
+    ];    protected $casts = [
         'rate' => 'decimal:2',
         'occupancy' => 'integer',
         'image' => 'array' // This will automatically handle JSON encoding/decoding
@@ -45,5 +44,11 @@ class Room extends Model
     public function getImagesAttribute()
     {
         return is_array($this->image) ? $this->image : [];
+    }
+
+    // Relationship with Admin
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'created_by', 'uuid');
     }
 }

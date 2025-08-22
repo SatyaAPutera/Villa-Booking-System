@@ -29,6 +29,9 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
+        // Load the admin relationship
+        $room->load('admin');
+        
         return view('frontend.rooms.detail', compact('room'))->with('title', 'Room Details - ' . $room->name);
     }
 
