@@ -3,14 +3,14 @@
     <div>
         <!-- Hero Section with Room Image -->
         <div class="page-header min-vh-75 position-relative"
-            style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80');">
+            style="background-image: url('{{ $room->first_image ? asset($room->first_image) : 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80' }}');">
             <span class="mask bg-dark opacity-4"></span>
         </div>
 
         <!-- Room Details Card -->
         <div class="container mt-n6">
-            <div class="card shadow-xl bg-light">
-                <div class="card-body p-5">
+            <div class="card shadow-xl">
+                <div class="card-body p-5" style="background-color: #f8f9fa;">
                     
                     <!-- Contact Info Section -->
                     <div class="row mb-5">
@@ -25,7 +25,7 @@
                                             <i class="fa fa-user text-white text-sm"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0 font-weight-bold">Siti</h6>
+                                            <h6 class="mb-0 font-weight-bold">{{ $room->admin->name ?? 'Admin' }}</h6>
                                             <small class="text-muted">Partner</small>
                                         </div>
                                     </div>
@@ -76,22 +76,67 @@
                     <div class="row mt-5">
                         <div class="col-12">
                             <h3 class="font-weight-bold mb-4">Room Gallery</h3>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                                         class="img-fluid rounded-3 shadow" alt="Conference Room View">
+                            @if($room->images && count($room->images) > 0)
+                                <div id="roomCarousel" class="carousel slide shadow-lg rounded-3" data-bs-ride="carousel">
+                                    <!-- Carousel Indicators -->
+                                    <div class="carousel-indicators">
+                                        @foreach($room->images as $index => $image)
+                                            <button type="button" data-bs-target="#roomCarousel" data-bs-slide-to="{{ $index }}" 
+                                                    class="{{ $index === 0 ? 'active' : '' }}" 
+                                                    aria-current="{{ $index === 0 ? 'true' : 'false' }}" 
+                                                    aria-label="Slide {{ $index + 1 }}"></button>
+                                        @endforeach
+                                    </div>
+                                    
+                                    <!-- Carousel Items -->
+                                    <div class="carousel-inner rounded-3">
+                                        @foreach($room->images as $index => $image)
+                                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                                <img src="{{ asset($image) }}" 
+                                                     class="d-block w-100" 
+                                                     alt="Room Image {{ $index + 1 }}"
+                                                     style="height: 400px; object-fit: cover; cursor: pointer;"
+                                                     data-bs-toggle="modal" 
+                                                     data-bs-target="#imageModal"
+                                                     onclick="showFullImage('{{ asset($image) }}', 'Room Image {{ $index + 1 }}')">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    
+                                    <!-- Carousel Controls -->
+                                    @if(count($room->images) > 1)
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
+                                    @endif
                                 </div>
-                                <div class="col-md-3">
-                                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                         class="img-fluid rounded-3 shadow mb-3" alt="Meeting Setup">
-                                    <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                         class="img-fluid rounded-3 shadow" alt="Presentation Area">
+                            @else
+                                <div class="text-center py-5">
+                                    <div class="avatar avatar-xl bg-gradient-secondary rounded-circle mx-auto mb-3">
+                                        <i class="fa fa-image text-white text-lg"></i>
+                                    </div>
+                                    <h5 class="text-muted">No images available</h5>
+                                    <p class="text-muted">This room doesn't have any uploaded images yet.</p>
                                 </div>
-                                <div class="col-md-3">
-                                    <img src="https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                         class="img-fluid rounded-3 shadow mb-3" alt="City View">
-                                    <img src="https://images.unsplash.com/photo-1582653291997-079a1c04e5a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                         class="img-fluid rounded-3 shadow" alt="Seating Arrangement">
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Fullscreen Image Modal -->
+                    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="imageModalLabel">Room Image</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center p-0">
+                                    <img id="fullscreenImage" src="" alt="" class="img-fluid w-100">
                                 </div>
                             </div>
                         </div>
@@ -120,4 +165,62 @@
     </div>
 @endsection
 @push('script')
+<script>
+function showFullImage(imageSrc, imageAlt) {
+    console.log('Showing image:', imageSrc); // Debug log
+    const fullscreenImg = document.getElementById('fullscreenImage');
+    const modalTitle = document.getElementById('imageModalLabel');
+    
+    if (fullscreenImg) {
+        fullscreenImg.src = imageSrc;
+        fullscreenImg.alt = imageAlt;
+    }
+    
+    if (modalTitle) {
+        modalTitle.textContent = imageAlt;
+    }
+    
+    // Try to show modal - check for different Bootstrap versions
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        // For Bootstrap 5
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+        // For Bootstrap 4 or jQuery
+        else if (typeof $ !== 'undefined' && $.fn.modal) {
+            $(modal).modal('show');
+        }
+        // Fallback
+        else {
+            modal.style.display = 'block';
+            modal.classList.add('show');
+            document.body.classList.add('modal-open');
+        }
+    }
+}
+
+// Close modal when clicking outside or on close button
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                // Close modal
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) bsModal.hide();
+                } else if (typeof $ !== 'undefined' && $.fn.modal) {
+                    $(modal).modal('hide');
+                } else {
+                    modal.style.display = 'none';
+                    modal.classList.remove('show');
+                    document.body.classList.remove('modal-open');
+                }
+            }
+        });
+    }
+});
+</script>
 @endpush

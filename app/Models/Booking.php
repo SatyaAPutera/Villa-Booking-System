@@ -20,4 +20,20 @@ class Booking extends Model
     {
         return with(new static)->getTable();
     }
+
+    /**
+     * Get the room that belongs to the booking.
+     */
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_id', 'uuid');
+    }
+
+    /**
+     * Get the user that owns the booking.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'uuid');
+    }
 }

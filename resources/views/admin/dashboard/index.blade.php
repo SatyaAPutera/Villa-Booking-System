@@ -280,18 +280,20 @@ const bookingCtx = document.getElementById('bookingChart').getContext('2d');
 const bookingChart = new Chart(bookingCtx, {
     type: 'doughnut',
     data: {
-        labels: ['Confirmed', 'Completed', 'Pending', 'Cancelled'],
+        labels: ['Booked', 'Available', 'Cancelled'],
         datasets: [{
-            data: {!! json_encode($bookingDistribution ?? [45, 30, 15, 10]) !!},
+            data: [
+                {{ $confirmedBookings ?? 0 }}, 
+                {{ $pendingBookings ?? 0 }}, 
+                {{ $cancelledBookings ?? 0 }}
+            ],
             backgroundColor: [
                 '#4e73df',
-                '#1cc88a', 
                 '#f6c23e',
                 '#e74a3b'
             ],
             hoverBackgroundColor: [
                 '#2e59d9',
-                '#17a673',
                 '#f4b619',
                 '#e02d1b'
             ],

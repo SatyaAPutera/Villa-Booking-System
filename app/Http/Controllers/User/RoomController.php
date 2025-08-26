@@ -37,16 +37,13 @@ class RoomController extends Controller
 
     public function getAvailableRooms(Request $request, BookingService $bookingService)
     {
-        $start_date = $request->from_date;
-        $end_date = $request->to_date;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
 
-        $fromDate = Carbon::parse($start_date)->toDateString();
-        $toDate = Carbon::parse($end_date)->toDateString();
-
-        $rooms = $bookingService->availableRooms($request->start_date, $request->end_date)->toArray();
+        $rooms = $bookingService->allRoomsWithAvailability($start_date, $end_date);
 
         return response()->json([
-            'message' => 'Rooms are available on these dates.',
+            'message' => 'Rooms with availability status.',
             'rooms' => $rooms
         ]);
     }

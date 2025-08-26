@@ -62,7 +62,12 @@
                     success: function(data) {
                         var options = '<option value="">Select a room</option>';
                         $.each(data.rooms, function(index, room) {
-                            options += '<option value="' + room.uuid + '">' + room.room_no + '</option>';
+                            var isAvailable = room.is_available == 1;
+                            var optionText = room.name + (isAvailable ? '' : ' (Booked)');
+                            var disabled = isAvailable ? '' : ' disabled';
+                            var style = isAvailable ? '' : ' style="color: #999; background-color: #f5f5f5;"';
+                            
+                            options += '<option value="' + room.uuid + '"' + disabled + style + '>' + optionText + '</option>';
                         });
                         console.log(data.rooms)
                         $('#room_id').html(options);

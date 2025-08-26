@@ -17,12 +17,39 @@ class BookingService
         return DB::table(Room::getTableName() . ' as r')
             ->leftJoin(Booking::getTableName() . ' as b', function ($query) use ($fromDate, $toDate) {
                 $query->on('r.uuid', '=', 'b.room_id')
-                    ->whereDate('b.start_date', '<=', $fromDate)
-                    ->whereDate('b.end_date', '>=', $toDate);
+                    ->where('b.status', '=', 1) // Only check confirmed bookings
+                    ->where(function($dateQuery) use ($fromDate, $toDate) {
+                        $dateQuery->where(function($q) use ($fromDate, $toDate) {
+                            // Booking overlaps with selected date range
+                            $q->whereDate('b.start_date', '<=', $toDate)
+                              ->whereDate('b.end_date', '>=', $fromDate);
+                        });
+                    });
             })
-            ->whereNull('b.room_id')
-            ->select('r.*')
+            ->select('r.*', DB::raw('CASE WHEN b.room_id IS NOT NULL THEN 0 ELSE 1 END as is_available'))
             ->distinct()
+            ->get();
+    }
+
+    public function allRoomsWithAvailability($fromDate = null, $toDate = null)
+    {
+        if ($toDate === null || $toDate === '') {
+            $toDate = $fromDate;
+        }
+        
+        return DB::table(Room::getTableName() . ' as r')
+            ->leftJoin(Booking::getTableName() . ' as b', function ($query) use ($fromDate, $toDate) {
+                $query->on('r.uuid', '=', 'b.room_id')
+                    ->where('b.status', '=', 1) // Only check confirmed bookings
+                    ->where(function($dateQuery) use ($fromDate, $toDate) {
+                        $dateQuery->where(function($q) use ($fromDate, $toDate) {
+                            // Booking overlaps with selected date range
+                            $q->whereDate('b.start_date', '<=', $toDate)
+                              ->whereDate('b.end_date', '>=', $fromDate);
+                        });
+                    });
+            })
+            ->select('r.*', DB::raw('CASE WHEN b.room_id IS NOT NULL THEN 0 ELSE 1 END as is_available'))
             ->get();
     }
 }

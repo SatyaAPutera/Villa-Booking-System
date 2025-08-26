@@ -41,11 +41,11 @@
                 </div>
                 <div class="col-6">
                     <div class="input-group input-group-static my-3">
-                        <label class="" for="room_id">Room No</label>
+                        <label class="" for="room_id">Room Name</label>
                         <select class="form-control @error('room_id') is-invalid @enderror" id="room_id" name="room_id">
                             <option value="">Select a room</option>
                             @foreach ($rooms as $room)
-                                <option value="{{ $room->uuid }}">{{ $room->room_no }}</option>
+                                <option value="{{ $room->uuid }}">{{ $room->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -69,7 +69,7 @@
                     </div>
                 </div>
                 <div class="text-end">
-                    <button type="submit" class="btn btn-sm btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-sm btn-primary" id="submitBtn">Submit</button>
                 </div>
             </form>
         </div>
@@ -77,6 +77,45 @@
 @endsection
 @push('script')
 <script type="text/javascript">
+// Validate form before submission
+document.getElementById('submitBtn').addEventListener('click', function(e) {
+    var roomSelect = document.getElementById('room_id');
+    var selectedOption = roomSelect.options[roomSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.disabled) {
+        e.preventDefault();
+        alert('Please select an available room. The selected room is already booked for these dates.');
+        return false;
+    }
+    
+    if (!roomSelect.value) {
+        e.preventDefault();
+        alert('Please select a room.');
+        return false;
+    }
+});
 
+// Change submit button state based on room selection
+document.getElementById('room_id').addEventListener('change', function() {
+    var selectedOption = this.options[this.selectedIndex];
+    var submitBtn = document.getElementById('submitBtn');
+    
+    if (selectedOption && selectedOption.disabled) {
+        submitBtn.disabled = true;
+        submitBtn.classList.remove('btn-primary');
+        submitBtn.classList.add('btn-secondary');
+        submitBtn.textContent = 'Room Not Available';
+    } else if (this.value) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('btn-secondary');
+        submitBtn.classList.add('btn-primary');
+        submitBtn.textContent = 'Submit';
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('btn-secondary');
+        submitBtn.classList.add('btn-primary');
+        submitBtn.textContent = 'Submit';
+    }
+});
 </script>
 @endpush
