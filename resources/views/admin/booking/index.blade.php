@@ -21,7 +21,7 @@
                     <thead>
                         <tr>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Name</th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Room No</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Room Name</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Start Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">End Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder ">No. of Guests</th>
@@ -38,7 +38,7 @@
                             @foreach ($bookings as $booking)
                                 <tr>
                                     <td class="text-sm font-weight-normal mb-0">{{ $booking->booking_user }}</td>
-                                    <td class="text-sm font-weight-normal mb-0">{{ $booking->room_no }}</td>
+                                    <td class="text-sm font-weight-normal mb-0">{{ $booking->room_name }}</td>
                                     <td class="text-sm font-weight-normal mb-0">
                                         {{ DateHelper::format($booking->start_date) }}
                                     </td>

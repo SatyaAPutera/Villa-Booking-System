@@ -26,7 +26,7 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">To Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No. of
                                 Guests</th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Room Number
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Room Name
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Actions</th>
@@ -49,7 +49,7 @@
                                     </td>
                                     <td class="text-sm font-weight-normal mb-0 text-center">
                                         {{ $booking->no_of_guests }}</td>
-                                    <td class="text-sm font-weight-normal mb-0">{{ $booking->room_no }}</td>
+                                    <td class="text-sm font-weight-normal mb-0">{{ $booking->room_name }}</td>
                                     <td class="text-sm font-weight-normal mb-0">{{ BookingConstants::STATUS[$booking->status] }}</td>
                                     <td class="justify-content-center d-flex">
                                         <a href="{{ route('user.booking.show', $booking->uuid) }}" class="btn btn-link text-secondary mb-0"><i class="fa fa-eye" aria-hidden="true"></i></a>

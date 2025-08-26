@@ -25,8 +25,8 @@
                     <dd class="">{{ $booking->booking_user }}</dd>
                 </div>
                 <div class="col-6">
-                    <dt class="">Room Number</dt>
-                    <dd class="">{{ $booking->room_no }}</dd>
+                    <dt class="">Room Name</dt>
+                    <dd class="">{{ $booking->room_name }}</dd>
                 </div>
                 <div class="col-6">
                     <dt class="">Check-In Date</dt>
