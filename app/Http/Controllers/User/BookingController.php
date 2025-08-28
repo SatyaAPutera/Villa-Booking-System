@@ -63,7 +63,7 @@ class BookingController extends Controller
                 'end_date' => $request->end_date,
                 'no_of_guests' => $request->no_of_guests,
                 'remarks' => $request->remarks,
-                'status' => BookingConstants::BOOKED,
+                'status' => BookingConstants::CONFIRMED,
             ]);
         } else {
             $roomsNeeded = ceil($guests / 2);
@@ -82,7 +82,7 @@ class BookingController extends Controller
                             'end_date' => $request->end_date,
                             'no_of_guests' => $no_of_guests,
                             'remarks' => $request->remarks,
-                            'status' => BookingConstants::BOOKED,
+                            'status' => BookingConstants::CONFIRMED,
                         ]);
                         $booking->save();
                         $bookedRoomIds[] = $roomId;

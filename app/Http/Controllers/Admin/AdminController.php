@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Constants\BookingConstants;
 use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
@@ -98,9 +99,9 @@ class AdminController extends Controller
         }
         
         // Booking status distribution for pie chart (based on new status system)
-        $confirmedBookings = Booking::where('status', 2)->count(); // Confirmed
-        $pendingBookings = Booking::where('status', 1)->count(); // Pending
-        $cancelledBookings = Booking::where('status', 3)->count(); // Canceled
+        $confirmedBookings = Booking::where('status', BookingConstants::CONFIRMED)->count(); // Confirmed
+        $completedBookings = Booking::where('status', BookingConstants::COMPLETED)->count(); // Completed
+        $cancelledBookings = Booking::where('status', BookingConstants::CANCELED)->count(); // Canceled
         
         // Recent bookings for the table
         $recentBookings = Booking::with(['room', 'user'])
@@ -124,7 +125,7 @@ class AdminController extends Controller
             'revenueData',
             'revenueLabels',
             'confirmedBookings',
-            'pendingBookings',
+            'completedBookings',
             'cancelledBookings',
             'recentBookings',
             'monthlyBookings'

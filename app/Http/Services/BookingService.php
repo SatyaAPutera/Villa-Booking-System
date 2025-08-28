@@ -17,7 +17,7 @@ class BookingService
         return DB::table(Room::getTableName() . ' as r')
             ->leftJoin(Booking::getTableName() . ' as b', function ($query) use ($fromDate, $toDate) {
                 $query->on('r.uuid', '=', 'b.room_id')
-                    ->where('b.status', '=', 2) // Only check confirmed bookings
+                    ->where('b.status', '=', 1) // Only check confirmed bookings
                     ->where(function($dateQuery) use ($fromDate, $toDate) {
                         $dateQuery->where(function($q) use ($fromDate, $toDate) {
                             // Booking overlaps with selected date range
@@ -40,7 +40,7 @@ class BookingService
         return DB::table(Room::getTableName() . ' as r')
             ->leftJoin(Booking::getTableName() . ' as b', function ($query) use ($fromDate, $toDate) {
                 $query->on('r.uuid', '=', 'b.room_id')
-                    ->where('b.status', '=', 2) // Only check confirmed bookings
+                    ->where('b.status', '=', 1) // Only check confirmed bookings
                     ->where(function($dateQuery) use ($fromDate, $toDate) {
                         $dateQuery->where(function($q) use ($fromDate, $toDate) {
                             // Booking overlaps with selected date range

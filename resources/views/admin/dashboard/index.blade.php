@@ -129,13 +129,10 @@
                             <i class="fas fa-circle text-primary"></i> Confirmed
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Completed
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-warning"></i> Pending
-                        </span>
-                        <span class="mr-2">
                             <i class="fas fa-circle text-danger"></i> Cancelled
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Completed
                         </span>
                     </div>
                 </div>
@@ -173,8 +170,16 @@
                                     <td>{{ $booking->check_in ? \Carbon\Carbon::parse($booking->check_in)->format('M d, Y') : 'N/A' }}</td>
                                     <td>₹{{ number_format($booking->total_amount ?? 0, 2) }}</td>
                                     <td>
-                                        <span class="badge badge-{{ $booking->status == 'confirmed' ? 'success' : ($booking->status == 'pending' ? 'warning' : 'secondary') }}">
-                                            {{ ucfirst($booking->status ?? 'Unknown') }}
+                                        <span class="badge badge-{{ $booking->status == 1 ? 'success' : ($booking->status == 2 ? 'danger' : ($booking->status == 3 ? 'primary' : 'secondary')) }}">
+                                            @if($booking->status == 1)
+                                                Confirmed
+                                            @elseif($booking->status == 2)
+                                                Canceled
+                                            @elseif($booking->status == 3)
+                                                Completed
+                                            @else
+                                                Unknown
+                                            @endif
                                         </span>
                                     </td>
                                 </tr>
@@ -280,17 +285,17 @@ const bookingCtx = document.getElementById('bookingChart').getContext('2d');
 const bookingChart = new Chart(bookingCtx, {
     type: 'doughnut',
     data: {
-        labels: ['Confirmed', 'Pending', 'Canceled'],
+        labels: ['Confirmed', 'Canceled', 'Completed'],
         datasets: [{
             data: [
                 {{ $confirmedBookings ?? 0 }}, 
-                {{ $pendingBookings ?? 0 }}, 
-                {{ $cancelledBookings ?? 0 }}
+                {{ $cancelledBookings ?? 0 }},
+                {{ $completedBookings ?? 0 }}
             ],
             backgroundColor: [
                 '#4e73df',
-                '#f6c23e',
-                '#e74a3b'
+                '#e74a3b',
+                '#1cc88a'
             ],
             hoverBackgroundColor: [
                 '#2e59d9',
