@@ -280,7 +280,7 @@ const bookingCtx = document.getElementById('bookingChart').getContext('2d');
 const bookingChart = new Chart(bookingCtx, {
     type: 'doughnut',
     data: {
-        labels: ['Booked', 'Available', 'Cancelled'],
+        labels: ['Confirmed', 'Pending', 'Canceled'],
         datasets: [{
             data: [
                 {{ $confirmedBookings ?? 0 }}, 

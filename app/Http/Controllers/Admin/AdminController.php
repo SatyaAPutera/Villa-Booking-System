@@ -97,10 +97,10 @@ class AdminController extends Controller
             $revenueData[] = $dailyRevenue ?? 0;
         }
         
-        // Booking status distribution for pie chart (based on status integers)
-        $confirmedBookings = Booking::where('status', 1)->count(); // Booked
-        $pendingBookings = Booking::where('status', 2)->count(); // Available (pending)
-        $cancelledBookings = Booking::where('status', 0)->count(); // Deleted (cancelled)
+        // Booking status distribution for pie chart (based on new status system)
+        $confirmedBookings = Booking::where('status', 2)->count(); // Confirmed
+        $pendingBookings = Booking::where('status', 1)->count(); // Pending
+        $cancelledBookings = Booking::where('status', 3)->count(); // Canceled
         
         // Recent bookings for the table
         $recentBookings = Booking::with(['room', 'user'])
