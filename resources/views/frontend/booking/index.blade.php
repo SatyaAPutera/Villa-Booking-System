@@ -50,18 +50,12 @@
                                     <td class="text-sm font-weight-normal mb-0 text-center">
                                         {{ $booking->no_of_guests }}</td>
                                     <td class="text-sm font-weight-normal mb-0">{{ $booking->room_name }}</td>
-                                    <td class="text-sm font-weight-normal mb-0">{{ BookingConstants::STATUS[$booking->status] }}</td>
+                                    <td class="text-sm font-weight-normal mb-0">{{ \App\Http\Constants\BookingConstants::STATUS[$booking->status] }}</td>
                                     <td class="justify-content-center d-flex">
-                                        <a href="{{ route('user.booking.show', $booking->uuid) }}" class="btn btn-link text-secondary mb-0"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                                        <form action="{{ route('user.booking.destroy', $booking->uuid) }}" method="POST">
-                                            @csrf
-                                            @method('delete')
-                                            <button type="submit" class="text-danger px-1 btn delete" title="delete">
-                                                <span class="btn-inner--icon">
-                                                    <i class="fa fa-trash"></i>
-                                                </span>
-                                            </button>
-                                        </form>
+                                        <a href="{{ route('user.booking.show', $booking->uuid) }}" 
+                                           class="btn btn-sm btn-outline-primary" title="View Details">
+                                            <i class="fa fa-eye" aria-hidden="true"></i> View
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

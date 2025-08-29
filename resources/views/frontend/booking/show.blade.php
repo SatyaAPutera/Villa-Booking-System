@@ -53,9 +53,29 @@
                     </div>
                     <div class="col-6">
                         <dt class="">Status</dt>
-                        <dd class="">{{ BookingConstants::STATUS[$booking->status] }}</dd>
+                        <dd class="">{{ \App\Http\Constants\BookingConstants::STATUS[$booking->status] }}</dd>
                     </div>
                 </dl>
+                
+                <!-- Cancel Button Section -->
+                @if($booking->status == \App\Http\Constants\BookingConstants::CONFIRMED)
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <form action="{{ route('user.booking.cancel', $booking->uuid) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" 
+                                    class="btn btn-outline-danger" 
+                                    onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                <i class="fa fa-times"></i> Cancel Booking
+                            </button>
+                        </form>
+                        <a href="{{ route('user.booking.index') }}" class="btn btn-outline-secondary ms-2">
+                            <i class="fa fa-arrow-left"></i> Back to Bookings
+                        </a>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>

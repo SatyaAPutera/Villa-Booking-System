@@ -35,6 +35,7 @@ Route::group(['as' => 'user.', 'namespace' => 'User'], function () {
         Route::get('logout', [UserController::class, 'userLogout'])->name('logout');
         Route::get('/get-available-rooms', [RoomController::class, 'getAvailableRooms'])->name('get-available-rooms');
         Route::resource('booking', BookingController::class);
+        Route::patch('booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
     });
 });
 

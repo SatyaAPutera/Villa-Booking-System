@@ -45,7 +45,9 @@
                         <select class="form-control @error('room_id') is-invalid @enderror" id="room_id" name="room_id">
                             <option value="">Select a room</option>
                             @foreach ($rooms as $room)
-                                <option value="{{ $room->uuid }}">{{ $room->name }}</option>
+                                <option value="{{ $room->uuid }}" data-rate="{{ $room->rate ?? 0 }}">
+                                    {{ $room->name }} - ₹{{ number_format($room->rate ?? 0, 2) }}/night
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -54,12 +56,8 @@
                     <div class="input-group input-group-static my-3">
                         <label class="" for="no_of_guests">No. of Guests</label>
                         <input class="form-control @error('no_of_guests') is-invalid @enderror" id="guests"
-                            type="text" name="no_of_guests" value="{{ old('no_of_guests') }}"
-                            onchange="calculateRooms()" />
+                            type="text" name="no_of_guests" value="{{ old('no_of_guests') }}" />
                     </div>
-                    <p id="roomsRequired" class="text-warning">
-
-                    </p>
                 </div>
                 <div class="col-6">
                     <div class="input-group input-group-static my-3">
@@ -77,25 +75,22 @@
 @endsection
 @push('script')
 <script type="text/javascript">
-// Validate form before submission
-document.getElementById('submitBtn').addEventListener('click', function(e) {
-    var roomSelect = document.getElementById('room_id');
-    var selectedOption = roomSelect.options[roomSelect.selectedIndex];
+// Calculate number of nights
+function calculateNights() {
+    var startDate = document.getElementById('start_date').value;
+    var endDate = document.getElementById('end_date').value;
     
-    if (selectedOption && selectedOption.disabled) {
-        e.preventDefault();
-        alert('Please select an available room. The selected room is already booked for these dates.');
-        return false;
+    if (startDate && endDate) {
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+        var timeDiff = end.getTime() - start.getTime();
+        var nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        return nights > 0 ? nights : 0;
     }
-    
-    if (!roomSelect.value) {
-        e.preventDefault();
-        alert('Please select a room.');
-        return false;
-    }
-});
+    return 0;
+}
 
-// Change submit button state based on room selection
+// Event listeners
 document.getElementById('room_id').addEventListener('change', function() {
     var selectedOption = this.options[this.selectedIndex];
     var submitBtn = document.getElementById('submitBtn');
@@ -115,6 +110,31 @@ document.getElementById('room_id').addEventListener('change', function() {
         submitBtn.classList.remove('btn-secondary');
         submitBtn.classList.add('btn-primary');
         submitBtn.textContent = 'Submit';
+    }
+});
+
+// Validate form before submission
+document.getElementById('submitBtn').addEventListener('click', function(e) {
+    var roomSelect = document.getElementById('room_id');
+    var selectedOption = roomSelect.options[roomSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.disabled) {
+        e.preventDefault();
+        alert('Please select an available room. The selected room is already booked for these dates.');
+        return false;
+    }
+    
+    if (!roomSelect.value) {
+        e.preventDefault();
+        alert('Please select a room.');
+        return false;
+    }
+    
+    var nights = calculateNights();
+    if (nights <= 0) {
+        e.preventDefault();
+        alert('Please select valid check-in and check-out dates.');
+        return false;
     }
 });
 </script>

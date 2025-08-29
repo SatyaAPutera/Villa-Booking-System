@@ -9,35 +9,27 @@
 
         <!-- Room Details Card -->
         <div class="container mt-n6">
-            <div class="card shadow-xl">
-                <div class="card-body p-5" style="background-color: #f8f9fa;">
+            <div class="card shadow-xl rounded-4">
+                <div class="card-body p-5 rounded-4" style="background-color: #f8f9fa;">
+                    <h1 class="display-4 font-weight-bold mb-4">{{ $room->name ?? 'Gedung Auditorium Widya Sabha Universitas Udayana' }}</h1>
                     
-                    <!-- Contact Info Section -->
-                    <div class="row mb-5">
-                        <div class="col-12">
-                            <h1 class="display-4 font-weight-bold mb-3">{{ $room->name ?? 'Gedung Auditorium Widya Sabha Universitas Udayana' }}</h1>
-                            <p class="lead mb-4">Professional meeting space with panoramic city views</p>
-                            <h3 class="font-weight-bold mb-4">Contact Info</h3>
+                    <!-- Contact Info Card (Inside Main Card) -->
+                    <div class="card shadow-lg mb-5 rounded-4">
+                        <div class="card-body p-4 rounded-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <h3 class="font-weight-bold mb-4 text-white">
+                                <i class="fa fa-address-book me-2"></i>Contact Info
+                            </h3>
                             <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="avatar avatar-sm bg-gradient-primary rounded-circle me-3">
-                                            <i class="fa fa-user text-white text-sm"></i>
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-lg bg-white rounded-circle me-4 shadow">
+                                            <i class="fa fa-user text-primary text-lg"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0 font-weight-bold">{{ $room->admin->name ?? 'Admin' }}</h6>
-                                            <small class="text-muted">Partner</small>
+                                            <h5 class="mb-1 font-weight-bold text-white">{{ $room->admin->name ?? 'Admin' }}</h5>
+                                            <p class="mb-0 text-white-50">Property Manager</p>
+                                            <small class="text-white-50">Available for inquiries and support</small>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex gap-3">
-                                        <a href="#" class="btn btn-outline-primary btn-sm rounded-circle">
-                                            <i class="fa fa-info text-sm"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-outline-success btn-sm rounded-circle">
-                                            <i class="fa fa-phone text-sm"></i>
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -45,7 +37,7 @@
                     </div>
 
                     <!-- Overview Section -->
-                    <div class="row">
+                    <div class="row mb-5">
                         <div class="col-12">
                             <h3 class="font-weight-bold mb-4">Overview</h3>
                             <div class="row">
@@ -55,8 +47,8 @@
                                     </p>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="card bg-light border">
-                                        <div class="card-body text-center">
+                                    <div class="card bg-light border rounded-4">
+                                        <div class="card-body text-center rounded-4">
                                             <h4 class="font-weight-bold text-primary">₹ {{ $room->rate }}</h4>
                                             <small class="text-muted">per night</small>
                                             <div class="mt-3">
@@ -73,7 +65,7 @@
                     </div>
 
                     <!-- Gallery Section -->
-                    <div class="row mt-5">
+                    <div class="row mb-5">
                         <div class="col-12">
                             <h3 class="font-weight-bold mb-4">Room Gallery</h3>
                             @if($room->images && count($room->images) > 0)
@@ -145,8 +137,8 @@
                     <!-- Booking Section -->
                     <div class="row mt-5">
                         <div class="col-12">
-                            <div class="card bg-gradient-primary">
-                                <div class="card-body text-center text-white">
+                            <div class="card bg-gradient-primary rounded-4">
+                                <div class="card-body text-center text-white rounded-4">
                                     <h4 class="text-white font-weight-bold">Ready to Book?</h4>
                                     <p class="mb-4 opacity-8">Reserve this premium conference room for your next important meeting</p>
                                     <a href="{{ route('user.booking.create', ['room' => $room->uuid ?? '#']) }}" 
@@ -158,7 +150,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
