@@ -17,6 +17,8 @@ class AdminSeeder extends Seeder
         $insertData = [[
             'uuid' => Str::orderedUuid(),
             'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'phone_number' => '+62812345678',
             'username' => 'admin',
             'password' => bcrypt('1234'),
             'created_at' => now(),

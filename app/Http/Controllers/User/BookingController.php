@@ -38,7 +38,8 @@ class BookingController extends Controller
     public function create(BookingService $bookingService)
     {
         $today = Carbon::now()->toDateString();
-        $rooms = $bookingService->availableRooms($today);
+        // Get all rooms with proper model properties including rate
+        $rooms = Room::all();
         return $this->renderView('frontend.booking.create', compact('rooms'), 'Booking');
     }
 
@@ -54,45 +55,16 @@ class BookingController extends Controller
             'remarks' => 'required',
             'no_of_guests' => 'required|numeric',
         ]);
-        $guests = $request->no_of_guests;
-        if ($guests <= 2) {
-            Booking::create([
-                'user_id' => auth()->user()->uuid,
-                'room_id' => $request->room_id,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
-                'no_of_guests' => $request->no_of_guests,
-                'remarks' => $request->remarks,
-                'status' => BookingConstants::CONFIRMED,
-            ]);
-        } else {
-            $roomsNeeded = ceil($guests / 2);
-            $bookedRoomIds = [];
-            $availableRooms = $bookingService->availableRooms($request->start_date, $request->end_date)->toArray();
-            if (count($availableRooms) > $roomsNeeded) {
-                foreach ($availableRooms as $room) {
-                    $no_of_guests = min($guests, 2);
 
-                    $roomId = $room->uuid;
-                    if ($no_of_guests >= 1) {
-                        $booking = new Booking([
-                            'user_id' => auth()->user()->uuid,
-                            'room_id' => $roomId,
-                            'start_date' => $request->start_date,
-                            'end_date' => $request->end_date,
-                            'no_of_guests' => $no_of_guests,
-                            'remarks' => $request->remarks,
-                            'status' => BookingConstants::CONFIRMED,
-                        ]);
-                        $booking->save();
-                        $bookedRoomIds[] = $roomId;
-                        $guests -= $no_of_guests;
-                    }
-                }
-            } else {
-                return redirect()->back()->withErrors(['Insufficient available rooms for booking.']);
-            }
-        }
+        Booking::create([
+            'user_id' => auth()->user()->uuid,
+            'room_id' => $request->room_id,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'no_of_guests' => $request->no_of_guests,
+            'remarks' => $request->remarks,
+            'status' => BookingConstants::CONFIRMED,
+        ]);
 
         return redirect()->route('user.booking.index')->with('success', 'Room details added successfully.');
     }
@@ -147,5 +119,28 @@ class BookingController extends Controller
     {
         $booking->delete();
         return  redirect()->route('user.booking.index')->with('success', 'Booking deleted successfully!');
+    }
+
+    /**
+     * Cancel the specified booking.
+     */
+    public function cancel(Booking $booking)
+    {
+        // Check if the booking belongs to the authenticated user
+        if ($booking->user_id !== auth()->user()->uuid) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if the booking can be cancelled (only confirmed bookings can be cancelled)
+        if ($booking->status !== BookingConstants::CONFIRMED) {
+            return redirect()->back()->withErrors(['This booking cannot be cancelled.']);
+        }
+
+        // Update the booking status to cancelled
+        $booking->update([
+            'status' => BookingConstants::CANCELED
+        ]);
+
+        return redirect()->route('user.booking.index')->with('success', 'Booking cancelled successfully!');
     }
 }

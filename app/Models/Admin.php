@@ -16,6 +16,15 @@ class Admin extends Authenticatable
 
     protected $primaryKey = 'uuid';
 
+    protected $fillable = [
+        'name',
+        'email',
+        'phone_number',
+        'username',
+        'password',
+        'profile_image',
+    ];
+
     protected $guarded = ['uuid'];
 
     protected $guard = 'admin';
