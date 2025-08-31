@@ -27,8 +27,8 @@
                                         </div>
                                         <div>
                                             <h5 class="mb-1 font-weight-bold text-white">{{ $room->admin->name ?? 'Admin' }}</h5>
-                                            <p class="mb-0 text-white-50">Property Manager</p>
-                                            <small class="text-white-50">Available for inquiries and support</small>
+                                            <small class="text-white-50 d-block">{{ $room->admin->phone_number ?? 'No phone number available' }}</small>
+                                            <small class="text-white-50">{{ $room->admin->email ?? 'No email available' }}</small>
                                         </div>
                                     </div>
                                 </div>
