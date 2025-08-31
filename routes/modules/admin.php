@@ -32,6 +32,10 @@ Route::group(['as' => 'admin.', 'namespace' => 'Admin', 'prefix' => 'admin'], fu
         Route::resource('rooms', RoomController::class);
         Route::resource('booking', BookingController::class);
         Route::resource('user', UserController::class);
+        
+        // Admin creation routes
+        Route::get('/admin/create', [AdminController::class, 'createAdmin'])->name('admin.create');
+        Route::post('/admin/store', [AdminController::class, 'storeAdmin'])->name('admin.store');
     });
 });
 

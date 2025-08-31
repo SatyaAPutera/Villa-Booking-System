@@ -155,4 +155,36 @@ class AdminController extends Controller
     {
         //
     }
+
+    /**
+     * Show the form for creating a new admin.
+     */
+    public function createAdmin()
+    {
+        return $this->renderView('admin.user.create_admin', [], 'Add New Admin');
+    }
+
+    /**
+     * Store a newly created admin in storage.
+     */
+    public function storeAdmin(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:admins,email',
+            'mobile' => 'nullable|string|max:20',
+            'username' => 'required|string|min:3|max:255|unique:admins,username',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        \App\Models\Admin::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->mobile, // Note: admin table uses phone_number, form uses mobile
+            'username' => $request->username,
+            'password' => bcrypt($request->password),
+        ]);
+
+        return redirect()->route('admin.user.index')->with('success', 'Admin created successfully!');
+    }
 }
