@@ -25,6 +25,14 @@
                     <dd class="">{{ $booking->booking_user }}</dd>
                 </div>
                 <div class="col-6">
+                    <dt class="">Guest Email</dt>
+                    <dd class="">{{ $booking->user_email ?? 'N/A' }}</dd>
+                </div>
+                <div class="col-6">
+                    <dt class="">Guest Phone</dt>
+                    <dd class="">{{ $booking->user_mobile ?? 'N/A' }}</dd>
+                </div>
+                <div class="col-6">
                     <dt class="">Room Name</dt>
                     <dd class="">{{ $booking->room_name }}</dd>
                 </div>

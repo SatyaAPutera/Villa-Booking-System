@@ -75,7 +75,7 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $booking = DB::table(Booking::getTableName().' as b')
-        ->select('b.uuid', 'b.number', 'b.created_at', 'b.start_date', 'b.end_date', 'b.status', 'b.remarks', 'b.no_of_guests', 'r.name as room_name', 'u.name as booking_user')
+        ->select('b.uuid', 'b.number', 'b.created_at', 'b.start_date', 'b.end_date', 'b.status', 'b.remarks', 'b.no_of_guests', 'r.name as room_name', 'u.name as booking_user', 'u.email as user_email', 'u.mobile as user_mobile')
         ->join(Room::getTableName().' as r', 'r.uuid', 'b.room_id')
         ->join(User::getTableName().' as u', 'u.uuid', 'b.user_id')
         ->where('b.uuid', $booking->uuid)

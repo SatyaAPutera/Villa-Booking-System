@@ -40,6 +40,19 @@
                                     </div>
                                 </div>
                                 <div class="row my-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="text" name="mobile" 
+                                            class="form-control @error('mobile') is-invalid @enderror px-2"
+                                            placeholder="Enter phone number (e.g., +62812345678)">
+                                        @error('mobile')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row my-3"
                                     <div class="col-6">
                                         <label class="form-label">Username</label>
                                         <input type="text" name="username"
