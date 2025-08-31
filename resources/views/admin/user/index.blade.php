@@ -11,6 +11,11 @@
                 <div class="col-4 me-auto">
                     <p class="lead text-dark pt-1 mb-0">List of All Users</p>
                 </div>
+                <div class="col-auto">
+                    <a href="{{ route('admin.user.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fa fa-plus"></i> Add User
+                    </a>
+                </div>
             </div>
         </div>
         <div class="card-body p-2">

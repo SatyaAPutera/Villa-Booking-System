@@ -15,9 +15,19 @@ class User extends Authenticatable
 
     protected $primaryKey = 'uuid';
 
-    protected $guard = 'user';
+    protected $fillable = [
+        'name',
+        'email',
+        'mobile',
+        'username',
+        'password',
+        'profile_image',
+        'email_verified_at',
+    ];
+
     protected $guarded = ['uuid'];
 
+    protected $guard = 'user';
     protected $table = 'users';
 
     public static function getTableName()
