@@ -53,7 +53,21 @@
                     </div>
                     <div class="col-6">
                         <dt class="">Status</dt>
-                        <dd class="">{{ \App\Http\Constants\BookingConstants::STATUS[$booking->status] }}</dd>
+                        <dd class="">
+                            @php
+                                $statusClass = match($booking->status) {
+                                    1 => 'bg-success text-white',  // Confirmed
+                                    2 => 'bg-danger text-white',   // Canceled
+                                    3 => 'bg-primary text-white',  // Completed
+                                    0 => 'bg-secondary text-white', // Deleted
+                                    default => 'bg-secondary text-white'
+                                };
+                                $statusText = \App\Http\Constants\BookingConstants::STATUS[$booking->status] ?? 'Unknown';
+                            @endphp
+                            <span class="badge {{ $statusClass }} px-3 py-2">
+                                {{ $statusText }}
+                            </span>
+                        </dd>
                     </div>
                 </dl>
                 

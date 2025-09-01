@@ -49,7 +49,7 @@
                                 <div class="col-lg-4">
                                     <div class="card bg-light border rounded-4">
                                         <div class="card-body text-center rounded-4">
-                                            <h4 class="font-weight-bold text-primary">₹ {{ $room->rate }}</h4>
+                                            <h4 class="font-weight-bold text-primary">Rp {{ number_format($room->rate, 0, ',', '.') }}</h4>
                                             <small class="text-muted">per night</small>
                                             <div class="mt-3">
                                                 <a href="{{ route('user.booking.create', ['room' => $room->uuid ?? '#']) }}" 

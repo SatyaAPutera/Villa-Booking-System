@@ -22,6 +22,7 @@
                 <table class="table align-items-center mb-0 text-center">
                     <thead>
                         <tr>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Booking ID</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">From Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">To Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No. of
@@ -35,12 +36,15 @@
                     <tbody>
                         @if (empty($bookings))
                             <tr>
-                                <td class="text-sm font-weight-normal mb-0 text-center text-warning" colspan="5">No
+                                <td class="text-sm font-weight-normal mb-0 text-center text-warning" colspan="7">No
                                     Bookings Found!!</td>
                             </tr>
                         @else
                             @foreach ($bookings as $booking)
                                 <tr>
+                                    <td class="text-sm font-weight-normal mb-0">
+                                        <strong>#{{ $booking->number ?? substr($booking->uuid, 0, 8) }}</strong>
+                                    </td>
                                     <td class="text-sm font-weight-normal mb-0">
                                         {{ DateHelper::format($booking->start_date) }}
                                     </td>
@@ -50,7 +54,21 @@
                                     <td class="text-sm font-weight-normal mb-0 text-center">
                                         {{ $booking->no_of_guests }}</td>
                                     <td class="text-sm font-weight-normal mb-0">{{ $booking->room_name }}</td>
-                                    <td class="text-sm font-weight-normal mb-0">{{ \App\Http\Constants\BookingConstants::STATUS[$booking->status] }}</td>
+                                    <td class="text-sm font-weight-normal mb-0">
+                                        @php
+                                            $statusClass = match($booking->status) {
+                                                1 => 'bg-success text-white',  // Confirmed
+                                                2 => 'bg-danger text-white',   // Canceled
+                                                3 => 'bg-primary text-white',  // Completed
+                                                0 => 'bg-secondary text-white', // Deleted
+                                                default => 'bg-secondary text-white'
+                                            };
+                                            $statusText = \App\Http\Constants\BookingConstants::STATUS[$booking->status] ?? 'Unknown';
+                                        @endphp
+                                        <span class="badge {{ $statusClass }} px-2 py-1">
+                                            {{ $statusText }}
+                                        </span>
+                                    </td>
                                     <td class="justify-content-center d-flex">
                                         <a href="{{ route('user.booking.show', $booking->uuid) }}" 
                                            class="btn btn-sm btn-outline-primary" title="View Details">

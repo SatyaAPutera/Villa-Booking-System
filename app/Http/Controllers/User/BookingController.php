@@ -24,7 +24,7 @@ class BookingController extends Controller
     public function index()
     {
         $bookings = DB::table(Booking::getTableName() . ' as b')
-            ->select('b.uuid', 'b.start_date', 'b.end_date', 'b.status', 'b.remarks', 'b.no_of_guests', 'r.name as room_name')
+            ->select('b.uuid', 'b.number', 'b.start_date', 'b.end_date', 'b.status', 'b.remarks', 'b.no_of_guests', 'r.name as room_name')
             ->join(Room::getTableName() . ' as r', 'r.uuid', 'b.room_id')
             ->where('b.user_id', auth()->user()->uuid)
             ->orderBy('b.start_date', 'DESC')
@@ -56,6 +56,37 @@ class BookingController extends Controller
             'no_of_guests' => 'required|numeric',
         ]);
 
+        // Get the selected room to fetch its rate
+        $room = Room::where('uuid', $request->room_id)->first();
+        
+        if (!$room) {
+            return redirect()->back()->with('error', 'Selected room not found.');
+        }
+
+        // Calculate the number of nights
+        $startDate = Carbon::parse($request->start_date);
+        $endDate = Carbon::parse($request->end_date);
+        $nights = $startDate->diffInDays($endDate);
+        
+        // Calculate total amount (room rate × number of nights)
+        $totalAmount = $room->rate * $nights;
+
+        // Generate a user-friendly booking number
+        $latestBooking = Booking::whereNotNull('number')
+                               ->orderBy('created_at', 'desc')
+                               ->first();
+        
+        if ($latestBooking && $latestBooking->number) {
+            // Extract number from format like "BK1001" and increment
+            $lastNumber = intval(substr($latestBooking->number, 2));
+            $newNumber = $lastNumber + 1;
+        } else {
+            // Start from 1001 if no previous bookings
+            $newNumber = 1001;
+        }
+        
+        $bookingNumber = 'J' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
         Booking::create([
             'user_id' => auth()->user()->uuid,
             'room_id' => $request->room_id,
@@ -63,10 +94,12 @@ class BookingController extends Controller
             'end_date' => $request->end_date,
             'no_of_guests' => $request->no_of_guests,
             'remarks' => $request->remarks,
+            'amount' => $totalAmount,
+            'number' => $bookingNumber,
             'status' => BookingConstants::CONFIRMED,
         ]);
 
-        return redirect()->route('user.booking.index')->with('success', 'Room details added successfully.');
+        return redirect()->route('user.booking.index')->with('success', 'Room booked successfully. Booking ID: ' . $bookingNumber . ' | Total amount: Rp ' . number_format($totalAmount, 0, ',', '.'));
     }
 
     private function bookRoom($bookedIds = [], $from_date, $to_date)

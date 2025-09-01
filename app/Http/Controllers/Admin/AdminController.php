@@ -61,28 +61,30 @@ class AdminController extends Controller
         // Basic counts
         $totalUsers = User::count();
         $totalRooms = Room::count();
-        $totalBookings = Booking::count();
+        $totalBookings = Booking::whereNotIn('status', [BookingConstants::CANCELED, BookingConstants::DELETED])->count();
         
-        // Available rooms (not booked today)
+        // Available rooms (not booked today by confirmed/completed bookings)
         $availableRooms = DB::table(Room::getTableName().' as r')
-        ->leftJoin(Booking::getTableName().' as b', 'b.room_id', 'r.uuid')
-        ->where(function($query) use ($today) {
-            $query->whereNull('b.room_id')
-                  ->orWhereDate('b.start_date', '<>', $today)
-                  ->orWhereDate('b.end_date', '<>', $today);
+        ->leftJoin(Booking::getTableName().' as b', function($join) use ($today) {
+            $join->on('b.room_id', 'r.uuid')
+                 ->whereDate('b.start_date', '<=', $today)
+                 ->whereDate('b.end_date', '>=', $today)
+                 ->whereNotIn('b.status', [BookingConstants::CANCELED, BookingConstants::DELETED]);
         })
-        ->select('r.*')
+        ->whereNull('b.room_id')
         ->count();
         
-        // Total revenue from all bookings
-        $totalRevenue = Booking::sum('amount');
+        // Total revenue from confirmed and completed bookings (excluding cancelled)
+        $totalRevenue = Booking::whereNotIn('status', [BookingConstants::CANCELED, BookingConstants::DELETED])
+                              ->sum('amount');
         
         // Average daily rate (average room rate)
         $averageDailyRate = Room::avg('rate');
         
-        // Occupancy rate calculation (booked rooms / total rooms * 100)
+        // Occupancy rate calculation (confirmed/completed booked rooms / total rooms * 100)
         $bookedRoomsToday = Booking::whereDate('start_date', '<=', $today)
                                   ->whereDate('end_date', '>=', $today)
+                                  ->whereNotIn('status', [BookingConstants::CANCELED, BookingConstants::DELETED])
                                   ->distinct('room_id')
                                   ->count();
         $occupancyRate = $totalRooms > 0 ? ($bookedRoomsToday / $totalRooms) * 100 : 0;
@@ -94,6 +96,7 @@ class AdminController extends Controller
             $date = Carbon::now()->subDays($i);
             $revenueLabels[] = $date->format('M d');
             $dailyRevenue = Booking::whereDate('created_at', $date->toDateString())
+                                  ->whereNotIn('status', [BookingConstants::CANCELED, BookingConstants::DELETED])
                                   ->sum('amount');
             $revenueData[] = $dailyRevenue ?? 0;
         }
@@ -103,16 +106,32 @@ class AdminController extends Controller
         $completedBookings = Booking::where('status', BookingConstants::COMPLETED)->count(); // Completed
         $cancelledBookings = Booking::where('status', BookingConstants::CANCELED)->count(); // Canceled
         
-        // Recent bookings for the table
-        $recentBookings = Booking::with(['room', 'user'])
-                                ->orderBy('created_at', 'desc')
-                                ->limit(5)
-                                ->get();
+        // Recent bookings for the table (using proper field names)
+        $recentBookings = DB::table(Booking::getTableName().' as b')
+                           ->select('b.uuid', 'b.number', 'b.start_date', 'b.end_date', 'b.amount', 'b.status', 
+                                   'u.name as user_name', 'r.name as room_name')
+                           ->join(User::getTableName().' as u', 'u.uuid', 'b.user_id')
+                           ->join(Room::getTableName().' as r', 'r.uuid', 'b.room_id')
+                           ->orderBy('b.created_at', 'desc')
+                           ->limit(5)
+                           ->get();
         
-        // Monthly bookings count
+        // Monthly bookings count (excluding cancelled and deleted)
         $monthlyBookings = Booking::whereMonth('created_at', Carbon::now()->month)
                                  ->whereYear('created_at', Carbon::now()->year)
+                                 ->whereNotIn('status', [BookingConstants::CANCELED, BookingConstants::DELETED])
                                  ->count();
+        
+        // Monthly revenue (excluding cancelled and deleted bookings)
+        $monthlyRevenue = Booking::whereMonth('created_at', Carbon::now()->month)
+                                ->whereYear('created_at', Carbon::now()->year)
+                                ->whereNotIn('status', [BookingConstants::CANCELED, BookingConstants::DELETED])
+                                ->sum('amount');
+        
+        // New users this month
+        $newUsersThisMonth = User::whereMonth('created_at', Carbon::now()->month)
+                                ->whereYear('created_at', Carbon::now()->year)
+                                ->count();
         
         return view('admin.dashboard.index', compact(
             'totalRooms', 
@@ -128,7 +147,9 @@ class AdminController extends Controller
             'completedBookings',
             'cancelledBookings',
             'recentBookings',
-            'monthlyBookings'
+            'monthlyBookings',
+            'monthlyRevenue',
+            'newUsersThisMonth'
         ));
     }
 
