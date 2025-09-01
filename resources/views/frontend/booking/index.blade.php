@@ -18,6 +18,70 @@
             </div>
         </header>
         <div class="card card-body shadow-xl mx-3 mx-md-4 mt-n6">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span class="alert-icon"><i class="fas fa-check"></i></span>
+                    <span class="alert-text">{{ session('success') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
+            @if(session('booking_details'))
+                <!-- Booking Success Modal -->
+                <div class="modal fade" id="bookingSuccessModal" tabindex="-1" role="dialog" aria-labelledby="bookingSuccessModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title text-white" id="bookingSuccessModalLabel">
+                                    <i class="fas fa-check-circle me-2"></i>Booking Confirmed!
+                                </h5>
+                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-12 text-center mb-3">
+                                        <h4 class="text-success">Your booking has been confirmed successfully!</h4>
+                                        <p class="text-muted">Please save your booking details for future reference.</p>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Booking Summary</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        @php $details = session('booking_details'); @endphp
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Booking ID:</strong> <span class="text-primary">#{{ $details['booking_number'] ?? 'N/A' }}</span></p>
+                                                <p><strong>Room:</strong> {{ $details['room_name'] ?? 'N/A' }}</p>
+                                                <p><strong>Check-in:</strong> {{ $details['start_date'] ?? 'N/A' }}</p>
+                                                <p><strong>Check-out:</strong> {{ $details['end_date'] ?? 'N/A' }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Number of Guests:</strong> {{ $details['no_of_guests'] ?? 'N/A' }}</p>
+                                                <p><strong>Number of Nights:</strong> {{ $details['nights'] ?? 'N/A' }}</p>
+                                                <p><strong>Rate per Night:</strong> Rp {{ number_format($details['room_rate'] ?? 0, 0, ',', '.') }}</p>
+                                                <p><strong class="text-success">Total Amount:</strong> <span class="text-success h5">Rp {{ number_format($details['total_amount'] ?? 0, 0, ',', '.') }}</span></p>
+                                            </div>
+                                        </div>
+                                        @if($details['remarks'] ?? false)
+                                            <hr>
+                                            <p><strong>Remarks:</strong> {{ $details['remarks'] }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <a href="{{ route('user.booking.show', $details['booking_uuid'] ?? '#') }}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            
             <div class="table-responsive">
                 <table class="table align-items-center mb-0 text-center">
                     <thead>
@@ -84,5 +148,28 @@
         </div>
     </div>
 @endsection
+
+@push('script')
+@if(session('booking_details'))
+<script>
+$(document).ready(function() {
+    console.log('Booking details session found');
+    
+    // Test if modal exists
+    if ($('#bookingSuccessModal').length > 0) {
+        console.log('Modal element found, showing modal...');
+        $('#bookingSuccessModal').modal('show');
+    } else {
+        console.log('Modal element not found!');
+        alert('Booking confirmed successfully!\nBooking ID: {{ session("booking_details.booking_number", "N/A") }}\nTotal: Rp {{ number_format(session("booking_details.total_amount", 0), 0, ",", ".") }}');
+    }
+});
+</script>
+@else
+<script>
+console.log('No booking details in session');
+</script>
+@endif
+@endpush
 @push('script')
 @endpush

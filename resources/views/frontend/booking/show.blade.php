@@ -48,6 +48,29 @@
                         <dd class="">{{ DateHelper::format($booking->end_date) }}</dd>
                     </div>
                     <div class="col-6">
+                        <dt class="">No. of Guests</dt>
+                        <dd class="">{{ $booking->no_of_guests }}</dd>
+                    </div>
+                    <div class="col-6">
+                        <dt class="">Number of Nights</dt>
+                        <dd class="">
+                            @php
+                                $startDate = \Carbon\Carbon::parse($booking->start_date);
+                                $endDate = \Carbon\Carbon::parse($booking->end_date);
+                                $nights = $startDate->diffInDays($endDate);
+                            @endphp
+                            {{ $nights }} {{ $nights == 1 ? 'night' : 'nights' }}
+                        </dd>
+                    </div>
+                    <div class="col-6">
+                        <dt class="">Room Rate per Night</dt>
+                        <dd class="">Rp {{ number_format($booking->room_rate ?? 0, 0, ',', '.') }}</dd>
+                    </div>
+                    <div class="col-6">
+                        <dt class="text-success">Total Amount</dt>
+                        <dd class=""><span class="h5 text-success">Rp {{ number_format($booking->amount ?? 0, 0, ',', '.') }}</span></dd>
+                    </div>
+                    <div class="col-6">
                         <dt class="">Remarks</dt>
                         <dd class="">{{ $booking->remarks }}</dd>
                     </div>

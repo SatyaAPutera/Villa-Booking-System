@@ -87,7 +87,7 @@ class BookingController extends Controller
         
         $bookingNumber = 'J' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 
-        Booking::create([
+        $booking = Booking::create([
             'user_id' => auth()->user()->uuid,
             'room_id' => $request->room_id,
             'start_date' => $request->start_date,
@@ -99,7 +99,23 @@ class BookingController extends Controller
             'status' => BookingConstants::CONFIRMED,
         ]);
 
-        return redirect()->route('user.booking.index')->with('success', 'Room booked successfully. Booking ID: ' . $bookingNumber . ' | Total amount: Rp ' . number_format($totalAmount, 0, ',', '.'));
+        // Prepare booking details for the popup modal
+        $bookingDetails = [
+            'booking_uuid' => $booking->uuid,
+            'booking_number' => $bookingNumber,
+            'room_name' => $room->name,
+            'start_date' => $startDate->format('M d, Y'),
+            'end_date' => $endDate->format('M d, Y'),
+            'nights' => $nights,
+            'no_of_guests' => $request->no_of_guests,
+            'room_rate' => $room->rate,
+            'total_amount' => $totalAmount,
+            'remarks' => $request->remarks,
+        ];
+
+        return redirect()->route('user.booking.index')
+                        ->with('success', 'Room booked successfully!')
+                        ->with('booking_details', $bookingDetails);
     }
 
     private function bookRoom($bookedIds = [], $from_date, $to_date)
@@ -121,7 +137,7 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $booking = DB::table(Booking::getTableName() . ' as b')
-            ->select('b.uuid', 'b.number', 'b.created_at', 'b.start_date', 'b.end_date', 'b.status', 'b.remarks', 'b.no_of_guests', 'r.name as room_name', 'u.name as booking_user')
+            ->select('b.uuid', 'b.number', 'b.created_at', 'b.start_date', 'b.end_date', 'b.status', 'b.remarks', 'b.no_of_guests', 'b.amount', 'r.name as room_name', 'r.rate as room_rate', 'u.name as booking_user')
             ->join(Room::getTableName() . ' as r', 'r.uuid', 'b.room_id')
             ->join(User::getTableName() . ' as u', 'u.uuid', 'b.user_id')
             ->where('b.uuid', $booking->uuid)

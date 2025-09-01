@@ -66,27 +66,6 @@
                             name="remarks" value="{{ old('remarks') }}">
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="input-group input-group-static my-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">Booking Summary</h6>
-                                <div id="bookingSummary" style="display: none;">
-                                    <p class="mb-1"><strong>Room:</strong> <span id="selectedRoomName">-</span></p>
-                                    <p class="mb-1"><strong>Check-in:</strong> <span id="checkInDate">-</span></p>
-                                    <p class="mb-1"><strong>Check-out:</strong> <span id="checkOutDate">-</span></p>
-                                    <p class="mb-1"><strong>Number of Nights:</strong> <span id="numberOfNights">-</span></p>
-                                    <p class="mb-1"><strong>Rate per Night:</strong> <span id="ratePerNight">-</span></p>
-                                    <hr>
-                                    <p class="mb-0"><strong>Total Amount:</strong> <span id="totalAmount" class="text-primary fw-bold">Rp 0</span></p>
-                                </div>
-                                <div id="selectRoomMessage" class="text-muted">
-                                    Please select a room and dates to see booking summary.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="text-end">
                     <button type="submit" class="btn btn-sm btn-primary" id="submitBtn">Submit</button>
                 </div>
@@ -111,36 +90,6 @@ function calculateNights() {
     return 0;
 }
 
-// Update booking summary
-function updateBookingSummary() {
-    var roomSelect = document.getElementById('room_id');
-    var startDate = document.getElementById('start_date').value;
-    var endDate = document.getElementById('end_date').value;
-    var selectedOption = roomSelect.options[roomSelect.selectedIndex];
-    
-    if (roomSelect.value && startDate && endDate && selectedOption) {
-        var nights = calculateNights();
-        var rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
-        var totalAmount = rate * nights;
-        
-        // Update summary display
-        document.getElementById('selectedRoomName').textContent = selectedOption.text.split(' - ')[0];
-        document.getElementById('checkInDate').textContent = new Date(startDate).toLocaleDateString('id-ID');
-        document.getElementById('checkOutDate').textContent = new Date(endDate).toLocaleDateString('id-ID');
-        document.getElementById('numberOfNights').textContent = nights + (nights === 1 ? ' night' : ' nights');
-        document.getElementById('ratePerNight').textContent = 'Rp ' + rate.toLocaleString('id-ID');
-        document.getElementById('totalAmount').textContent = 'Rp ' + totalAmount.toLocaleString('id-ID');
-        
-        // Show summary, hide message
-        document.getElementById('bookingSummary').style.display = 'block';
-        document.getElementById('selectRoomMessage').style.display = 'none';
-    } else {
-        // Hide summary, show message
-        document.getElementById('bookingSummary').style.display = 'none';
-        document.getElementById('selectRoomMessage').style.display = 'block';
-    }
-}
-
 // Event listeners
 document.getElementById('room_id').addEventListener('change', function() {
     var selectedOption = this.options[this.selectedIndex];
@@ -162,13 +111,7 @@ document.getElementById('room_id').addEventListener('change', function() {
         submitBtn.classList.add('btn-primary');
         submitBtn.textContent = 'Submit';
     }
-    
-    updateBookingSummary();
 });
-
-// Add event listeners for date changes
-document.getElementById('start_date').addEventListener('change', updateBookingSummary);
-document.getElementById('end_date').addEventListener('change', updateBookingSummary);
 
 // Validate form before submission
 document.getElementById('submitBtn').addEventListener('click', function(e) {

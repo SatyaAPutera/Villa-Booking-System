@@ -20,23 +20,28 @@
                 <table class="table align-items-center mb-0 text-center">
                     <thead>
                         <tr>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Booking ID</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Name</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Room Name</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Start Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">End Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder ">No. of Guests</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Total Price</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (empty($bookings))
                             <tr>
-                                <td class="text-sm font-weight-normal mb-0 text-center text-warning" colspan="5">No
+                                <td class="text-sm font-weight-normal mb-0 text-center text-warning" colspan="8">No
                                     Bookings Found</td>
                             </tr>
                         @else
                             @foreach ($bookings as $booking)
                                 <tr>
+                                    <td class="text-sm font-weight-normal mb-0">
+                                        <strong>#{{ $booking->number ?? substr($booking->uuid, 0, 8) }}</strong>
+                                    </td>
                                     <td class="text-sm font-weight-normal mb-0">{{ $booking->booking_user }}</td>
                                     <td class="text-sm font-weight-normal mb-0">{{ $booking->room_name }}</td>
                                     <td class="text-sm font-weight-normal mb-0">
@@ -46,6 +51,9 @@
                                         {{ DateHelper::format($booking->end_date) }}
                                     </td>
                                     <td class="text-sm font-weight-normal mb-0 text-center">{{ $booking->no_of_guests }}</td>
+                                    <td class="text-sm font-weight-normal mb-0">
+                                        <span class="text-success fw-bold">Rp {{ number_format($booking->amount ?? 0, 0, ',', '.') }}</span>
+                                    </td>
                                     <td class="justify-content-center d-flex gap-2">
                                         <a href="{{ route('admin.booking.show', $booking->uuid) }}" 
                                            class="btn btn-sm btn-outline-info" 
