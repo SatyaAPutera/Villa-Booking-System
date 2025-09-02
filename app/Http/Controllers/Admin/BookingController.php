@@ -130,6 +130,24 @@ class BookingController extends Controller
     }
 
     /**
+     * Cancel the specified booking.
+     */
+    public function cancel(Booking $booking)
+    {
+        // Check if the booking can be cancelled (only confirmed bookings can be cancelled)
+        if ($booking->status !== BookingConstants::CONFIRMED) {
+            return redirect()->back()->withErrors(['This booking cannot be cancelled.']);
+        }
+
+        // Update the booking status to cancelled
+        $booking->update([
+            'status' => BookingConstants::CANCELED
+        ]);
+
+        return redirect()->route('admin.booking.index')->with('success', 'Booking cancelled successfully!');
+    }
+
+    /**
      * Remove the specified booking from storage.
      */
     public function destroy(Booking $booking)

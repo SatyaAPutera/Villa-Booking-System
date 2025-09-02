@@ -31,6 +31,7 @@ Route::group(['as' => 'admin.', 'namespace' => 'Admin', 'prefix' => 'admin'], fu
 
         Route::resource('rooms', RoomController::class);
         Route::resource('booking', BookingController::class);
+        Route::patch('booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
         Route::resource('user', UserController::class);
         
         // Admin creation routes
